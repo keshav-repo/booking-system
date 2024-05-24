@@ -17,4 +17,8 @@ public class MovieEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int movieId;
     private String name;
+    private String language;
+    private String about;
+    private String url;
+    private boolean isActive;
 }

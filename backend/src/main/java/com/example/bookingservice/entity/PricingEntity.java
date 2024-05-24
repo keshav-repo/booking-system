@@ -5,25 +5,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
-@Table(name = "screen")
+import java.math.BigDecimal;
+
+@Table(name = "pricing")
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ScreenEntity {
+public class PricingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int screenId;
+    private int pricingId;
 
-    private String screenName;
+    @Enumerated(EnumType.STRING)
+    private SeatType seatType;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theatreId")
     private TheatreEntity theatreEntity;
 
-    @OneToMany(mappedBy = "screenEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Seat> seatList;
+    private BigDecimal price;
 }

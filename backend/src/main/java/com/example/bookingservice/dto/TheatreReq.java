@@ -1,22 +1,13 @@
-package com.example.bookingservice.entity;
+package com.example.bookingservice.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "theatre")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class TheatreEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int theatreId;
-
+@NoArgsConstructor
+public class TheatreReq {
     private String name;
     private String city;
     private String state;

@@ -12,7 +12,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class BookingServiceApplication implements CommandLineRunner {
@@ -21,65 +25,57 @@ public class BookingServiceApplication implements CommandLineRunner {
         SpringApplication.run(BookingServiceApplication.class, args);
     }
 
-    @Autowired
-    private EntityManager entityManager;
+//    @Autowired
+//    private EntityManager entityManager;
 
-    @Autowired
-    private MovieRepository movieRepository;
-
-    @Autowired
-    private TheatreRepo theatreRepo;
-
-    @Autowired
-    private ShowRepo showRepo;
+//
+//    @Autowired
+//    private MovieRepository movieRepository;
+//
+//    @Autowired
+//    private TheatreRepo theatreRepo;
+//
+//    @Autowired
+//    private ShowRepo showRepo;
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        /*
-        MovieEntity movieEntity = MovieEntity.builder()
-                .name("Bahubali")
-                .build();
 
-        entityManager.persist(movieEntity);
-
-        TheatreEntity theatreEntity = TheatreEntity.builder()
-                .name("Inox")
-                .city("Bengaluru")
-                .state("Karnataka")
-                .country("India")
-                .addressLine1("address line 1")
-                .build();
-
-        entityManager.persist(theatreEntity);
-
-        ScreenEntity screenEntity = ScreenEntity.builder()
-                .screenName("Screen 1")
-                .theatreEntity(theatreEntity)
-                .build();
-
-        entityManager.persist(screenEntity);
-
-        Show show = Show.builder()
-                .createdAt(LocalDate.now())
-                .durationInMin(180)
-                .movieEntity(movieEntity)
-                .screenEntity(screenEntity)
-                .theatreEntity(theatreEntity)
-                .build();
-
-        entityManager.persist(show);
-
-         */
-
-//        List<MovieEntity> movieEntityList = movieRepository.findMoviesByTheatreCity("Bengaluru");
+//        MovieEntity movieEntity = MovieEntity.builder()
+//                .name("Avenger")
+//                .build();
 //
-//        System.out.println(movieEntityList);
+//        entityManager.persist(movieEntity);
 
-        List<ShowEntry> theatreEntityList =  showRepo.findByMovieId(1);
-        System.out.println(theatreEntityList);
-
-
-
+//        MovieEntity movieEntity = entityManager.find(MovieEntity.class, 1);
+//
+//        TheatreEntity theatreEntity = TheatreEntity.builder()
+//                .name("Inox 2")
+//                .city("Bengaluru")
+//                .state("Karnataka")
+//                .country("India")
+//                .addressLine1("address line 1")
+//                .build();
+//
+//        entityManager.persist(theatreEntity);
+//
+//        ScreenEntity screenEntity = ScreenEntity.builder()
+//                .screenName("Screen 2")
+//                .theatreEntity(theatreEntity)
+//                .build();
+//
+//        entityManager.persist(screenEntity);
+//
+//        ShowEntry show = ShowEntry.builder()
+//                .createdAt(LocalDateTime.now())
+//                .durationInMin(180)
+//                .movieEntity(movieEntity)
+//                .screenEntity(screenEntity)
+//                .theatreEntity(theatreEntity)
+//                .movieTiming(LocalDateTime.now().plusHours(2))
+//                .build();
+//
+//        entityManager.persist(show);
     }
 }

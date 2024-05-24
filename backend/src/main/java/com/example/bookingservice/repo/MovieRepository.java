@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<MovieEntity, Integer> {
     @Query("SELECT m FROM MovieEntity m WHERE m.movieId IN ( " +
-            "SELECT s.movieEntity.movieId FROM ShowEntry s " +
+            "SELECT s.movieEntity.movieId FROM ShowEntity s " +
             "INNER JOIN s.theatreEntity t " +
             "WHERE t.city = :city )")
     List<MovieEntity> findMoviesByTheatreCity(@Param("city") String city);

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "movieShow")
 @Entity
@@ -14,26 +16,29 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShowEntry {
+public class ShowEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int showId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screenId")
     private ScreenEntity screenEntity;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "theatreId")
     private TheatreEntity theatreEntity;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "movieId")
     private MovieEntity movieEntity;
 
-    private LocalDate movieTiming;
+    private LocalDateTime movieTiming;
     private int durationInMin;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     private boolean isActive;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<ShowSeat> seatList;
 }

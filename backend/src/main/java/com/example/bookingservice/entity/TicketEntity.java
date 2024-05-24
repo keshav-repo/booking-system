@@ -7,20 +7,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "theatre")
+@Table(name = "ticket")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TheatreEntity {
+public class TicketEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int theatreId;
+    private int ticketId;
 
-    private String name;
-    private String city;
-    private String state;
-    private String country;
-    private String addressLine1;
-    private String pin;
+
 }
