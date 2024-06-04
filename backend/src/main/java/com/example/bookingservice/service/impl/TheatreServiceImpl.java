@@ -2,16 +2,15 @@ package com.example.bookingservice.service.impl;
 
 import com.example.bookingservice.dto.*;
 import com.example.bookingservice.entity.*;
-import com.example.bookingservice.repo.ScreenRepo;
-import com.example.bookingservice.repo.SeatRepo;
-import com.example.bookingservice.repo.ShowRepo;
-import com.example.bookingservice.repo.TheatreRepo;
+import com.example.bookingservice.repo.*;
 import com.example.bookingservice.service.TheatreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +24,10 @@ public class TheatreServiceImpl implements TheatreService {
     private ScreenRepo screenRepo;
     @Autowired
     private SeatRepo seatRepo;
+
+    @Autowired
+    private PricingRepository pricingRepository;
+
     @Override
     public List<CityRes> getCityList() {
         List<String> cityList = theatreRepo.findDistinctCities();
@@ -125,5 +128,14 @@ public class TheatreServiceImpl implements TheatreService {
                 .col(seat.getCol())
                 .seatId(seat.getSeatId())
                 .build();
+    }
+
+    @Override
+    public BigDecimal getPrice(SeatType seatType, TheatreEntity theatreEntity) {
+        Optional<PricingEntity> pricingEntityOptional =  pricingRepository.findBySeatTypeAndTheatreEntity(seatType, theatreEntity);
+        if(!pricingEntityOptional.isPresent()){
+            // throw some exception here
+        }
+       return pricingEntityOptional.get().getPrice();
     }
 }

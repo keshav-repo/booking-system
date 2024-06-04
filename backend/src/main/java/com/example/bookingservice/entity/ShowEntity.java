@@ -1,18 +1,16 @@
 package com.example.bookingservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "movieShow")
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,11 +23,11 @@ public class ShowEntity {
     @JoinColumn(name = "screenId")
     private ScreenEntity screenEntity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theatreId")
     private TheatreEntity theatreEntity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movieId")
     private MovieEntity movieEntity;
 
@@ -39,6 +37,6 @@ public class ShowEntity {
     private LocalDateTime createdAt;
     private boolean isActive;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany( mappedBy = "showEntity", fetch = FetchType.LAZY)
     private List<ShowSeat> seatList;
 }

@@ -1,7 +1,10 @@
 package com.example.bookingservice.service;
 
 import com.example.bookingservice.dto.*;
+import com.example.bookingservice.entity.SeatType;
+import com.example.bookingservice.entity.TheatreEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface TheatreService {
@@ -45,4 +48,12 @@ public interface TheatreService {
      * @return
      */
     public SeatRes addSeat(SeatReq seatReq);
+
+    /**
+     * Get pricing for a particular seat type and theatre
+     * @param seatType
+     * @param theatreEntity
+     * @return
+     */
+    BigDecimal getPrice(SeatType seatType, TheatreEntity theatreEntity);
 }
