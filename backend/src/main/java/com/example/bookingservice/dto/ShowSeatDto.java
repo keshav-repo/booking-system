@@ -1,15 +1,18 @@
 package com.example.bookingservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ShowSeatDto {
+    private int showId;
+    private int theatreId;
+
+    
     private int showSeatId;
     private int row;
     private int col;

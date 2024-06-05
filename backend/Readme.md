@@ -5,7 +5,7 @@
 ```shell
 docker run --name mysql-server -e MYSQL_ROOT_PASSWORD=secret@123 -p 3300:3306 -d mysql:latest
 
-mysql -h 127.0.0.1 -P 3306 -u root -p secret@123
+mysql -h 127.0.0.1 -P 3300 -u root -p secret@123
 
 ```
 

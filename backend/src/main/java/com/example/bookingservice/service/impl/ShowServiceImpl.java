@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +28,10 @@ public class ShowServiceImpl implements ShowService {
     private ScreenRepo screenRepo;
     @Autowired
     private ShowSeatRepo showSeatRepo;
-
     @Autowired
     private PricingRepository pricingRepository;
-
     @Autowired
     private TheatreService theatreService;
-
     @Transactional
     @Override
     public ShowRes addShow(ShowReq showReq) {
@@ -86,13 +82,16 @@ public class ShowServiceImpl implements ShowService {
         return ShowRes.builder().showId(showEntity.getShowId()).build();
     }
 
+
     @Override
-    public List<ShowSeatDto> getSeatsForShow(int showId) {
-        Optional<ShowEntity> showEntityOptional = showRepo.findById(showId);
-        if (!showEntityOptional.isPresent()) {
+    public List<ShowSeatDto> getSeatsForShow(int theatreId, LocalDateTime movieTiming, int movieId) {
+
+        List<ShowEntity> showEntityList = showRepo.findShows(theatreId, movieTiming, movieId, true);
+        if (showEntityList.size()==0) {
             // throw error
         }
-        ShowEntity showEntity = showEntityOptional.get();
+        // we will assume that only one screen will play that movie at that time
+        ShowEntity showEntity  = showEntityList.get(0);
         return showEntity.getSeatList()
                 .stream().map(showSeat -> ShowSeatDto.builder()
                         .seatName(showSeat.getSeat().getSeatName())
