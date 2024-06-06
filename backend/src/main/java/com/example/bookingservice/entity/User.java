@@ -3,6 +3,8 @@ package com.example.bookingservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @Getter
@@ -19,4 +21,9 @@ public class User {
     private String userName;
     @Column(nullable = false)
     private String password;
+
+    @ManyToMany
+    @JoinTable(name = "userAuthorityMapping",  joinColumns = @JoinColumn(name = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "authorityId"))
+    private List<AuthorityEntity> authorities;
 }

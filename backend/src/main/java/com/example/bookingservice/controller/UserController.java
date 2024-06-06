@@ -2,6 +2,7 @@ package com.example.bookingservice.controller;
 
 import com.example.bookingservice.dto.LoginReq;
 import com.example.bookingservice.dto.UserRegistrationReq;
+import com.example.bookingservice.helper.JwtHelper;
 import com.example.bookingservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.pulsar.PulsarProperties;
@@ -21,16 +22,20 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
+    private JwtHelper jwtHelper;
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginReq loginReq) {
+    public ResponseEntity<String> login(@RequestBody LoginReq loginReq) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReq.getUserName(), loginReq.getPassword()));
         } catch (BadCredentialsException badCredentialsException) {
             throw badCredentialsException;
         }
-        return ResponseEntity.accepted().build();
+
+        String token = jwtHelper.generateToken(loginReq.getUserName());
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/signup")
