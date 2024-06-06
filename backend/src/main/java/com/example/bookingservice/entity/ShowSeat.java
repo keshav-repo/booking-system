@@ -29,4 +29,8 @@ public class ShowSeat {
 
     private boolean isAvailable;
     private BigDecimal price;
+
+    @ManyToOne
+    @JoinColumn(name = "ticketId", nullable = true)
+    private TicketEntity ticketEntity;
 }

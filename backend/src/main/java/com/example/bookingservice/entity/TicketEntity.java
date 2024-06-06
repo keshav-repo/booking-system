@@ -3,6 +3,9 @@ package com.example.bookingservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name = "ticket")
 @Getter
@@ -16,5 +19,16 @@ public class TicketEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ticketId;
 
+    private LocalDateTime bookingTime;
 
+    @OneToOne
+    @JoinColumn(name = "movieId")
+    private MovieEntity movieEntity;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "showId")
+    private ShowEntity showEntity;
+
+    @OneToMany(mappedBy = "ticketEntity", fetch = FetchType.LAZY)
+    private List<ShowSeat> showSeatList;
 }
