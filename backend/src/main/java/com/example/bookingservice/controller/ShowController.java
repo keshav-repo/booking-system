@@ -14,21 +14,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/show")
 public class ShowController {
-
     @Autowired
     private ShowService showService;
 
-    @PostMapping
-    public ShowRes addShow(@RequestBody ShowReq showReq){
-        return showService.addShow(showReq);
-    }
-
     @GetMapping("/seats")
     public List<ShowSeatDto> seatsForAShow(@RequestParam Integer theatreId,@RequestParam String localDateTime, @RequestParam int movieId){
-
         // Define the formatter
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
         return showService.getSeatsForShow(theatreId,  LocalDateTime.parse(localDateTime, formatter), movieId);
     }
 }

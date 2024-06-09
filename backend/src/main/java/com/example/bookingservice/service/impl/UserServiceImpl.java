@@ -7,6 +7,7 @@ import com.example.bookingservice.entity.User;
 import com.example.bookingservice.repo.AuthorityRepo;
 import com.example.bookingservice.repo.UserRepo;
 import com.example.bookingservice.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
@@ -48,6 +50,7 @@ public class UserServiceImpl implements UserService {
         return org.springframework.security.core.userdetails.User.withUsername(user.getUserName())
                 .password(new String(stringBuilder))
                 .authorities(grantedAuthorityList)
+                .roles(user.getAuthorities().stream().map(u -> u.getRole().name()).collect(Collectors.toList()).toArray(new String[0]))
                 .build();
     }
 
@@ -72,6 +75,12 @@ public class UserServiceImpl implements UserService {
                     .map(r -> authorityRepo.findByRole(Role.valueOf(r)))
                     .collect(Collectors.toList()));
         }
-        userRepo.save(user);
+        try{
+            userRepo.save(user);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("error in saving new user ");
+        }
     }
 }

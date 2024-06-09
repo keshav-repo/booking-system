@@ -33,4 +33,7 @@ public class ShowSeat {
     @ManyToOne
     @JoinColumn(name = "ticketId", nullable = true)
     private TicketEntity ticketEntity;
+
+    @Version
+    private long version;
 }

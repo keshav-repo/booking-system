@@ -22,7 +22,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "userAuthorityMapping",  joinColumns = @JoinColumn(name = "userId"),
             inverseJoinColumns = @JoinColumn(name = "authorityId"))
     private List<AuthorityEntity> authorities;

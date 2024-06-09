@@ -1,5 +1,6 @@
 package com.example.bookingservice.service.impl;
 
+import com.example.bookingservice.dto.BookSeatReq;
 import com.example.bookingservice.dto.ShowReq;
 import com.example.bookingservice.dto.ShowRes;
 import com.example.bookingservice.dto.ShowSeatDto;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +34,9 @@ public class ShowServiceImpl implements ShowService {
     private PricingRepository pricingRepository;
     @Autowired
     private TheatreService theatreService;
+    @Autowired
+    private TicketRepo ticketRepo;
+
     @Transactional
     @Override
     public ShowRes addShow(ShowReq showReq) {
@@ -87,11 +92,11 @@ public class ShowServiceImpl implements ShowService {
     public List<ShowSeatDto> getSeatsForShow(int theatreId, LocalDateTime movieTiming, int movieId) {
 
         List<ShowEntity> showEntityList = showRepo.findShows(theatreId, movieTiming, movieId, true);
-        if (showEntityList.size()==0) {
+        if (showEntityList.size() == 0) {
             // throw error
         }
         // we will assume that only one screen will play that movie at that time
-        ShowEntity showEntity  = showEntityList.get(0);
+        ShowEntity showEntity = showEntityList.get(0);
         return showEntity.getSeatList()
                 .stream().map(showSeat -> ShowSeatDto.builder()
                         .seatName(showSeat.getSeat().getSeatName())
@@ -102,5 +107,33 @@ public class ShowServiceImpl implements ShowService {
                         .isAvailable(showSeat.isAvailable())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void bookSeat(BookSeatReq bookSeatReq) {
+        Optional<ShowEntity> showEntityOptional = showRepo.findById(bookSeatReq.getShowId());
+        if (!showEntityOptional.isPresent()) {
+            throw new RuntimeException("No such show present");
+        }
+        ShowEntity showEntity = showEntityOptional.get();
+
+        List<ShowSeat> showSeatList = showSeatRepo.findAllById(bookSeatReq.getSeatIds());
+        if(showSeatList.size()!=bookSeatReq.getSeatIds().size()){
+            throw new RuntimeException("wrong seat are passed");
+        }
+        for(ShowSeat showSeat: showSeatList){
+            showSeat.setAvailable(false);
+        }
+
+
+        TicketEntity ticketEntity = TicketEntity.builder()
+                .bookingTime(LocalDateTime.now())
+                .movieEntity(showEntity.getMovieEntity())
+                .showEntity(showEntity)
+                .showSeatList(showSeatList)
+                .build();
+
+        ticketRepo.save(ticketEntity);
+
     }
 }

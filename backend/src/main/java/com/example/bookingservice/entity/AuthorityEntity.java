@@ -2,6 +2,7 @@ package com.example.bookingservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "userAuthority")
@@ -18,4 +19,7 @@ public class AuthorityEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @ManyToMany(mappedBy = "authorities", fetch = FetchType.LAZY)
+    private List<User> userList;
 }

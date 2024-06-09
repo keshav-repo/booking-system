@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ShowRepo extends JpaRepository<ShowEntity, Integer> {
 
-    @Query("SELECT s FROM ShowEntity s INNER JOIN TheatreEntity t ON t.theatreId = s.theatreEntity.theatreId WHERE s.movieEntity.movieId = :movieId")
+    @Query("SELECT s FROM ShowEntity s INNER JOIN TheatreEntity t ON t.theatreId = s.theatreEntity.theatreId WHERE s.movieEntity.movieId = :movieId AND FUNCTION('DATE', s.movieTiming) = CURRENT_DATE")
     List<ShowEntity> findByMovieId(@Param("movieId") int movieId);
 
     @Query("SELECT s FROM ShowEntity s WHERE s.theatreEntity.theatreId = :theatreId AND s.movieTiming = :movieTiming AND s.movieEntity.movieId = :movieId AND s.movieEntity.isActive = :isActive")
