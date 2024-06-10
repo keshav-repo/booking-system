@@ -40,7 +40,9 @@ public class TheatreRepoTest {
 
     @Test
     public void findByCityTest(){
+
 //       List<TheatreEntity>  bengaluruTheatres =  theatreRepo.findByCity("Bengaluru");
 //        Assertions.assertEquals(4, bengaluruTheatres.size());
+
     }
 }

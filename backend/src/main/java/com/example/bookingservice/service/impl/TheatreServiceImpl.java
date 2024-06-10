@@ -44,7 +44,7 @@ public class TheatreServiceImpl implements TheatreService {
         return showEntries.stream()
                 .collect(Collectors.groupingBy(
                         ShowEntity::getTheatreEntity,
-                        Collectors.mapping(ShowEntity::getMovieTiming, Collectors.toList())
+                        Collectors.mapping(ShowEntity::getMovieStartTiming, Collectors.toList())
                 ))
                 .entrySet().stream()
                 .map(entry -> MovieTheatreSearchRes.builder()

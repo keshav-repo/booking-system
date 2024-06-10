@@ -31,7 +31,9 @@ public class ShowEntity {
     @JoinColumn(name = "movieId")
     private MovieEntity movieEntity;
 
-    private LocalDateTime movieTiming;
+    private LocalDateTime movieStartTiming;
+    private LocalDateTime movieEndTiming;
+
     private int durationInMin;
 
     private LocalDateTime createdAt;

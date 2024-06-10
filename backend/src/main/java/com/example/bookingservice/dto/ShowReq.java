@@ -15,5 +15,6 @@ public class ShowReq {
     private int screenId;
     private int theatreId;
     private int movieId;
-    private LocalDateTime movieTiming;
+    private LocalDateTime movieStartTiming;
+    private LocalDateTime movieEndTiming;
 }

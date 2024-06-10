@@ -5,6 +5,7 @@ import com.example.bookingservice.dto.ShowReq;
 import com.example.bookingservice.dto.ShowRes;
 import com.example.bookingservice.dto.ShowSeatDto;
 import com.example.bookingservice.entity.*;
+import com.example.bookingservice.exception.*;
 import com.example.bookingservice.repo.*;
 import com.example.bookingservice.service.ShowService;
 import com.example.bookingservice.service.TheatreService;
@@ -40,16 +41,23 @@ public class ShowServiceImpl implements ShowService {
     @Transactional
     @Override
     public ShowRes addShow(ShowReq showReq) {
-        // do validate for all ids if exist
-        MovieEntity movieEntity = movieRepository.findById(showReq.getMovieId()).get();
-        ScreenEntity screenEntity = screenRepo.findById(showReq.getScreenId()).get();
-        TheatreEntity theatreEntity = theatreRepo.findById(showReq.getTheatreId()).get();
+        MovieEntity movieEntity = movieRepository.findById(showReq.getMovieId())
+                .orElseThrow(() -> new MovieNotFound(ErrorCode.MOVIE_NOT_FOUND.getMessage(), ErrorCode.SHOW_CONFLICT.getCode()));
+        TheatreEntity theatreEntity = theatreRepo.findById(showReq.getTheatreId())
+                .orElseThrow(() -> new TheatreNotFound(ErrorCode.THEATRE_NOT_FOUND.getMessage(), ErrorCode.THEATRE_NOT_FOUND.getCode()));
+        ScreenEntity screenEntity = screenRepo.findById(showReq.getScreenId())
+                .orElseThrow(() -> new ScreenNotFound(ErrorCode.SCREEN_NOT_FOUND.getMessage(), ErrorCode.SCREEN_NOT_FOUND.getCode()));
 
+        boolean isConflict = showRepo.hasConflictingShows(showReq.getTheatreId(), showReq.getScreenId(), showReq.getMovieId(), showReq.getMovieStartTiming(), showReq.getMovieEndTiming());
+        if (isConflict) {
+            throw new ShowConflictException(ErrorCode.SHOW_CONFLICT.getMessage(), ErrorCode.SHOW_CONFLICT.getCode());
+        }
         ShowEntity showEntity = ShowEntity.builder()
                 .movieEntity(movieEntity)
                 .screenEntity(screenEntity)
                 .theatreEntity(theatreEntity)
-                .movieTiming(showReq.getMovieTiming())
+                .movieStartTiming(showReq.getMovieStartTiming())
+                .movieEndTiming(showReq.getMovieEndTiming())
                 .createdAt(LocalDateTime.now())
                 .isActive(true)
                 .build();
@@ -118,10 +126,10 @@ public class ShowServiceImpl implements ShowService {
         ShowEntity showEntity = showEntityOptional.get();
 
         List<ShowSeat> showSeatList = showSeatRepo.findAllById(bookSeatReq.getSeatIds());
-        if(showSeatList.size()!=bookSeatReq.getSeatIds().size()){
+        if (showSeatList.size() != bookSeatReq.getSeatIds().size()) {
             throw new RuntimeException("wrong seat are passed");
         }
-        for(ShowSeat showSeat: showSeatList){
+        for (ShowSeat showSeat : showSeatList) {
             showSeat.setAvailable(false);
         }
 
