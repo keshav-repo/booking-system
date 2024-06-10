@@ -9,4 +9,5 @@ public class BaseException extends RuntimeException{
     public String getCode() {
         return code;
     }
+
 }

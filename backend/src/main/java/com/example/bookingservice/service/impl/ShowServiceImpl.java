@@ -1,16 +1,16 @@
 package com.example.bookingservice.service.impl;
 
-import com.example.bookingservice.dto.BookSeatReq;
-import com.example.bookingservice.dto.ShowReq;
-import com.example.bookingservice.dto.ShowRes;
-import com.example.bookingservice.dto.ShowSeatDto;
+import com.example.bookingservice.dto.*;
 import com.example.bookingservice.entity.*;
 import com.example.bookingservice.exception.*;
 import com.example.bookingservice.repo.*;
 import com.example.bookingservice.service.ShowService;
 import com.example.bookingservice.service.TheatreService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ShowServiceImpl implements ShowService {
     @Autowired
     private ShowRepo showRepo;
@@ -37,6 +38,8 @@ public class ShowServiceImpl implements ShowService {
     private TheatreService theatreService;
     @Autowired
     private TicketRepo ticketRepo;
+    @Autowired
+    private BookingRepo bookingRepo;
 
     @Transactional
     @Override
@@ -118,30 +121,76 @@ public class ShowServiceImpl implements ShowService {
     }
 
     @Override
-    public void bookSeat(BookSeatReq bookSeatReq) {
-        Optional<ShowEntity> showEntityOptional = showRepo.findById(bookSeatReq.getShowId());
+    @Transactional
+    public BookingDto bookSeat(BookSeatReq bookSeatReq) {
+        Optional<ShowEntity> showEntityOptional = showRepo.findByMovieEntityMovieIdAndTheatreEntityTheatreIdAndMovieStartTiming(bookSeatReq.getMovieId(), bookSeatReq.getTheatreId(), bookSeatReq.getMovieStartTiming());
         if (!showEntityOptional.isPresent()) {
-            throw new RuntimeException("No such show present");
+            throw new ShowNotFound(ErrorCode.SHOW_NOT_FOUND.getMessage(), ErrorCode.SHOW_NOT_FOUND.getCode());
         }
-        ShowEntity showEntity = showEntityOptional.get();
 
-        List<ShowSeat> showSeatList = showSeatRepo.findAllById(bookSeatReq.getSeatIds());
+        List<ShowSeat> showSeatList = showSeatList = showSeatRepo.findAllById(bookSeatReq.getSeatIds());
         if (showSeatList.size() != bookSeatReq.getSeatIds().size()) {
-            throw new RuntimeException("wrong seat are passed");
+            throw new SeatBookingInputError("wrong seat are passed", ErrorCode.SEAT_BOOKING_INPUT_ERROR.getCode());
         }
         for (ShowSeat showSeat : showSeatList) {
+            if (!showSeat.isAvailable()) {
+                throw new SeatBookingInputError("Given seat Id" + showSeat.getSeat().getSeatId() + " is not available", ErrorCode.SEAT_BOOKING_INPUT_ERROR.getCode());
+            }
             showSeat.setAvailable(false);
         }
+        try {
+            showSeatRepo.saveAll(showSeatList);
+        } catch (OptimisticLockingFailureException e) {
+            log.info("Failed to book the seat due to concurrent modification " + e.getMessage());
+            e.printStackTrace();
+            throw new SeatBookingInternalError("Failed to book the seat due to concurrent modification", ErrorCode.SEAT_BOOKING_ERROR.getCode());
+        } catch (Exception e) {
+            log.error("error reserving seat information");
+            e.printStackTrace();
+            throw new SeatBookingInternalError("error reserving seat information", ErrorCode.SEAT_BOOKING_ERROR.getCode());
+        }
 
-
-        TicketEntity ticketEntity = TicketEntity.builder()
+        BookingEntity bookingEntity = BookingEntity.builder()
                 .bookingTime(LocalDateTime.now())
-                .movieEntity(showEntity.getMovieEntity())
-                .showEntity(showEntity)
                 .showSeatList(showSeatList)
+                .showEntity(showEntityOptional.get())
                 .build();
 
-        ticketRepo.save(ticketEntity);
+        try {
+            bookingRepo.save(bookingEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SeatBookingInternalError("Error saving booking information", ErrorCode.SEAT_BOOKING_ERROR.getCode());
+        }
 
+        try {
+            for (ShowSeat showSeat : showSeatList) {
+                showSeat.setBookingEntity(bookingEntity);
+            }
+            showSeatRepo.saveAll(showSeatList);
+        } catch (Exception e) {
+            log.error("error reserving seat booking information");
+            e.printStackTrace();
+            throw new SeatBookingInternalError("error reserving seat booking information", ErrorCode.SEAT_BOOKING_ERROR.getCode());
+        }
+
+        List<SeatRes> seatResList = showSeatList.stream().map(showSeat -> SeatRes.builder()
+                        .seatId(showSeat.getSeat().getSeatId())
+                        .row(showSeat.getSeat().getRow())
+                        .col(showSeat.getSeat().getCol())
+                        .seatName(showSeat.getSeat().getSeatName())
+                        .seatType(showSeat.getSeat().getSeatType().name())
+                        .build())
+                .collect(Collectors.toList());
+
+        BookingDto bookingDto = BookingDto.builder()
+                .bookingId(bookingEntity.getBookingId())
+                .bookedSeat(seatResList)
+                .bookingTime(bookingEntity.getBookingTime())
+                .movieId(showEntityOptional.get().getMovieEntity().getMovieId())
+                .theatreId(showEntityOptional.get().getTheatreEntity().getTheatreId())
+                .build();
+
+        return bookingDto;
     }
 }

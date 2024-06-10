@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ShowRepo extends JpaRepository<ShowEntity, Integer> {
@@ -31,4 +32,7 @@ public interface ShowRepo extends JpaRepository<ShowEntity, Integer> {
                                 @Param("movieId") Integer movieId,
                                 @Param("startTime") LocalDateTime startTime,
                                 @Param("endTime") LocalDateTime endTime);
+
+    Optional<ShowEntity> findByMovieEntityMovieIdAndTheatreEntityTheatreIdAndMovieStartTiming(Integer movieId, Integer theatreId, LocalDateTime movieStartTiming);
+
 }

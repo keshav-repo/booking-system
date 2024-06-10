@@ -1,9 +1,6 @@
 package com.example.bookingservice.service;
 
-import com.example.bookingservice.dto.BookSeatReq;
-import com.example.bookingservice.dto.ShowReq;
-import com.example.bookingservice.dto.ShowRes;
-import com.example.bookingservice.dto.ShowSeatDto;
+import com.example.bookingservice.dto.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +16,6 @@ public interface ShowService {
     /**
      * book seats using given list of seats
      */
-    public void bookSeat(BookSeatReq bookSeatReq);
+    public BookingDto bookSeat(BookSeatReq bookSeatReq);
 
 }

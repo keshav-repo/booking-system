@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -11,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookSeatReq {
-    private int showId;
+    private int theatreId;
+    private int movieId;
     private List<Integer> seatIds;
+    private LocalDateTime movieStartTiming;
 }

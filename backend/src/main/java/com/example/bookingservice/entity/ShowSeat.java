@@ -36,4 +36,8 @@ public class ShowSeat {
 
     @Version
     private long version;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bookingId")
+    private BookingEntity bookingEntity;
 }

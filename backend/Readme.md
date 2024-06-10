@@ -4,9 +4,10 @@
 
 ```shell
 docker run --name mysql-server -e MYSQL_ROOT_PASSWORD=secret@123 -p 3300:3306 -d mysql:latest
-
 mysql -h 127.0.0.1 -P 3300 -u root -psecret@123
 
+docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
+redis-cli -h 127.0.0.1 -p 6379
 ```
 
 #### TO Learn

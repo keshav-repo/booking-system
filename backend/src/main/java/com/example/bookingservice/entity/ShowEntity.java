@@ -41,4 +41,7 @@ public class ShowEntity {
 
     @OneToMany( mappedBy = "showEntity", fetch = FetchType.LAZY)
     private List<ShowSeat> seatList;
+
+    @OneToMany(mappedBy = "showEntity", fetch = FetchType.LAZY)
+    private List<BookingEntity> bookingEntityList;
 }
