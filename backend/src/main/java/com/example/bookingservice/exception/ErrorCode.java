@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    REDIS_TTL_ERROR("ERR08", "Error in ttl listening"),
     SEAT_BOOKING_INPUT_ERROR("ERR07", "Book Seat input error"),
     SHOW_NOT_FOUND("ERR06", "Seat not found"),
     SEAT_BOOKING_ERROR("ERR05", "Seat booking error"),

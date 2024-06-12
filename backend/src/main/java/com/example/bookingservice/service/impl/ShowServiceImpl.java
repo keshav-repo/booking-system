@@ -1,5 +1,6 @@
 package com.example.bookingservice.service.impl;
 
+import com.example.bookingservice.config.Constants;
 import com.example.bookingservice.dto.*;
 import com.example.bookingservice.entity.*;
 import com.example.bookingservice.exception.*;
@@ -9,10 +10,14 @@ import com.example.bookingservice.service.TheatreService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +45,10 @@ public class ShowServiceImpl implements ShowService {
     private TicketRepo ticketRepo;
     @Autowired
     private BookingRepo bookingRepo;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    @Value("${booking.ttl.inMin}")
+    private long bookingTtl;
 
     @Transactional
     @Override
@@ -154,6 +163,7 @@ public class ShowServiceImpl implements ShowService {
                 .bookingTime(LocalDateTime.now())
                 .showSeatList(showSeatList)
                 .showEntity(showEntityOptional.get())
+                .bookingStatus(BookingStatus.CREATED)
                 .build();
 
         try {
@@ -172,6 +182,16 @@ public class ShowServiceImpl implements ShowService {
             log.error("error reserving seat booking information");
             e.printStackTrace();
             throw new SeatBookingInternalError("error reserving seat booking information", ErrorCode.SEAT_BOOKING_ERROR.getCode());
+        }
+
+        try{
+            BookingTTL bookingTTL = new BookingTTL(bookingEntity.getBookingId(), bookingEntity.getBookingTime());
+            ValueOperations<String, Object> opsForValue = redisTemplate.opsForValue();
+            String key = String.format(Constants.TTL_BOOKING_KEY_FORMAT, Constants.TTL_BOOKING_PREFIX, bookingTTL.getBookingId());
+            opsForValue.set(key, bookingTTL, Duration.ofMinutes(bookingTtl));
+        }catch (Exception e){
+            log.info("error saving booking info in redis");
+            throw new SeatBookingInternalError("error saving booking info in redis", ErrorCode.SEAT_BOOKING_ERROR.getCode());
         }
 
         List<SeatRes> seatResList = showSeatList.stream().map(showSeat -> SeatRes.builder()

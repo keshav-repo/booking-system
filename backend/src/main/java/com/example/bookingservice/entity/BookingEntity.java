@@ -27,4 +27,7 @@ public class BookingEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "showId", nullable = false)
     private ShowEntity showEntity;
+
+    @Enumerated(EnumType.STRING)
+    private BookingStatus bookingStatus;
 }
