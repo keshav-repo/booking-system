@@ -30,4 +30,8 @@ public class BookingEntity {
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", unique = false)
+    private User user;
 }

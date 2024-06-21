@@ -31,4 +31,8 @@ public class TicketEntity {
 
     @OneToMany(mappedBy = "ticketEntity", fetch = FetchType.LAZY)
     private List<ShowSeat> showSeatList;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", unique = false)
+    private User user;
 }

@@ -14,7 +14,6 @@ import java.util.List;
 public class ShowController {
     @Autowired
     private ShowService showService;
-
     @GetMapping("/seats")
     public List<ShowSeatDto> seatsForAShow(@RequestParam Integer theatreId,@RequestParam String localDateTime, @RequestParam int movieId){
         // Define the formatter

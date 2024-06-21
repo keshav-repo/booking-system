@@ -9,15 +9,14 @@ import com.example.bookingservice.exception.BookingNotFound;
 import com.example.bookingservice.exception.ErrorCode;
 import com.example.bookingservice.exception.PaymentAlreadyDone;
 import com.example.bookingservice.exception.PaymentInternalException;
-import com.example.bookingservice.repo.BookingRepo;
-import com.example.bookingservice.repo.PaymentRepo;
-import com.example.bookingservice.repo.ShowSeatRepo;
-import com.example.bookingservice.repo.TicketRepo;
+import com.example.bookingservice.repo.*;
 import com.example.bookingservice.service.PaymentService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,6 +38,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private ShowSeatRepo showSeatRepo;
 
+    @Autowired
+    private UserRepo userRepo;
+
     @Transactional
     @Override
     public TicketRes paymentConfirmation(PaymentConfirmDto paymentConfirmDto) {
@@ -48,7 +50,11 @@ public class PaymentServiceImpl implements PaymentService {
         }
         BookingEntity bookingEntity = bookingEntityOptional.get();
 
-        if(bookingEntity.getBookingStatus().equals(BookingStatus.CONFIRMED)){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        User user = userRepo.findByUserName(userName).get();
+
+        if (bookingEntity.getBookingStatus().equals(BookingStatus.CONFIRMED)) {
             throw new PaymentAlreadyDone(ErrorCode.PAYMENT_ALREADY_DONE.getMessage(), ErrorCode.PAYMENT_ALREADY_DONE.getCode());
         }
 
@@ -57,6 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentStatus(PaymentStatus.CONFIRMED)
                 .bookingEntity(bookingEntity)
                 .paymentId(paymentConfirmDto.getPaymentId())
+                .user(user)
                 .build();
         try {
             paymentRepo.save(paymentEntity);
@@ -74,6 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .bookingTime(LocalDateTime.now())
                 .movieEntity(movieEntity)
                 .showEntity(showEntity)
+                .user(user)
                 .build();
 
         try {
@@ -83,22 +91,22 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentInternalException(ErrorCode.PAYMENT_INTERNAL_EXCEPTION.getMessage(), ErrorCode.PAYMENT_INTERNAL_EXCEPTION.getCode());
         }
 
-        try{
-             for(ShowSeat showSeat: showSeatList){
-                 showSeat.setBookingEntity(bookingEntity);
-                 showSeat.setTicketEntity(ticketEntity);
-             }
+        try {
+            for (ShowSeat showSeat : showSeatList) {
+                showSeat.setBookingEntity(bookingEntity);
+                showSeat.setTicketEntity(ticketEntity);
+            }
             showSeatRepo.saveAll(showSeatList);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("error saving ticket information corresponding to a show seat");
             throw new PaymentInternalException(ErrorCode.PAYMENT_INTERNAL_EXCEPTION.getMessage(), ErrorCode.PAYMENT_INTERNAL_EXCEPTION.getCode());
         }
 
         // set booking status confirmed
         bookingEntity.setBookingStatus(BookingStatus.CONFIRMED);
-        try{
+        try {
             bookingRepo.save(bookingEntity);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("error saving booking status to confirm");
             throw new PaymentInternalException(ErrorCode.PAYMENT_INTERNAL_EXCEPTION.getMessage(), ErrorCode.PAYMENT_INTERNAL_EXCEPTION.getCode());
         }

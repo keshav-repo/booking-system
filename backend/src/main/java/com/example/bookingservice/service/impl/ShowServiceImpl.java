@@ -14,7 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -49,6 +50,9 @@ public class ShowServiceImpl implements ShowService {
     private RedisTemplate<String, Object> redisTemplate;
     @Value("${booking.ttl.inMin}")
     private long bookingTtl;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Transactional
     @Override
@@ -137,6 +141,10 @@ public class ShowServiceImpl implements ShowService {
             throw new ShowNotFound(ErrorCode.SHOW_NOT_FOUND.getMessage(), ErrorCode.SHOW_NOT_FOUND.getCode());
         }
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        User user =  userRepo.findByUserName(userName).get();
+
         List<ShowSeat> showSeatList = showSeatList = showSeatRepo.findAllById(bookSeatReq.getSeatIds());
         if (showSeatList.size() != bookSeatReq.getSeatIds().size()) {
             throw new SeatBookingInputError("wrong seat are passed", ErrorCode.SEAT_BOOKING_INPUT_ERROR.getCode());
@@ -164,6 +172,7 @@ public class ShowServiceImpl implements ShowService {
                 .showSeatList(showSeatList)
                 .showEntity(showEntityOptional.get())
                 .bookingStatus(BookingStatus.CREATED)
+                .user(user)
                 .build();
 
         try {
