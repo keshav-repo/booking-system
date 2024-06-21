@@ -26,4 +26,5 @@ public class ShowController {
     public BookingDto bookSeat(@RequestBody BookSeatReq bookSeatReq){
         return showService.bookSeat(bookSeatReq);
     }
+
 }

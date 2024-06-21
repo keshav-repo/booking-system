@@ -6,6 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    PAYMENT_ALREADY_DONE("ERROR11", "Payment already done"),
+    PAYMENT_INTERNAL_EXCEPTION("ERROR10", "Internal exception in payment"),
+    BOOKING_NOT_FOUND("ERROR09", "Booking Id not found"),
     REDIS_TTL_ERROR("ERR08", "Error in ttl listening"),
     SEAT_BOOKING_INPUT_ERROR("ERR07", "Book Seat input error"),
     SHOW_NOT_FOUND("ERR06", "Seat not found"),

@@ -10,7 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ShowConflictException.class})
+    @ExceptionHandler({ShowConflictException.class,PaymentAlreadyDone.class})
     public ResponseEntity<ErrorResponse> handleConflictException(BaseException ex, WebRequest request) {
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), ex.getCode()), HttpStatus.CONFLICT);
     }
@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInputErrorException(BaseException ex, WebRequest request) {
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), ex.getCode()), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler({MovieNotFound.class, ScreenNotFound.class, TheatreNotFound.class})
+    @ExceptionHandler({MovieNotFound.class, ScreenNotFound.class, TheatreNotFound.class, BookingNotFound.class})
     public ResponseEntity<ErrorResponse> handleNotFoundException(BaseException ex, WebRequest request) {
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), ex.getCode()), HttpStatus.NOT_FOUND);
     }

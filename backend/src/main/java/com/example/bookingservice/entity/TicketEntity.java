@@ -22,11 +22,11 @@ public class TicketEntity {
     private LocalDateTime bookingTime;
 
     @OneToOne
-    @JoinColumn(name = "movieId")
+    @JoinColumn(name = "movieId", unique = false)
     private MovieEntity movieEntity;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "showId")
+    @JoinColumn(name = "showId", unique=false)
     private ShowEntity showEntity;
 
     @OneToMany(mappedBy = "ticketEntity", fetch = FetchType.LAZY)
