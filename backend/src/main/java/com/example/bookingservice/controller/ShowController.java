@@ -18,7 +18,7 @@ public class ShowController {
     @GetMapping("/seats")
     public List<ShowSeatDto> seatsForAShow(@RequestParam Integer theatreId,@RequestParam String localDateTime, @RequestParam int movieId){
         // Define the formatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         return showService.getSeatsForShow(theatreId,  LocalDateTime.parse(localDateTime, formatter), movieId);
     }
 
@@ -26,5 +26,4 @@ public class ShowController {
     public BookingDto bookSeat(@RequestBody BookSeatReq bookSeatReq){
         return showService.bookSeat(bookSeatReq);
     }
-
 }

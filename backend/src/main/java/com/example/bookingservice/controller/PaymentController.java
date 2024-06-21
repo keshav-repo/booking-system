@@ -16,7 +16,7 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping("/conform")
+    @PostMapping("/confirm")
     public TicketRes confirm(@RequestBody PaymentConfirmDto paymentConfirmDto){
        return paymentService.paymentConfirmation(paymentConfirmDto);
     }
