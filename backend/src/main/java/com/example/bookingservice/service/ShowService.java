@@ -18,4 +18,5 @@ public interface ShowService {
      */
     public BookingDto bookSeat(BookSeatReq bookSeatReq);
 
+    public List<TicketRes> allTickets();
 }

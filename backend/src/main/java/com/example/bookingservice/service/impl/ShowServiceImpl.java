@@ -143,7 +143,7 @@ public class ShowServiceImpl implements ShowService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        User user =  userRepo.findByUserName(userName).get();
+        User user = userRepo.findByUserName(userName).get();
 
         List<ShowSeat> showSeatList = showSeatList = showSeatRepo.findAllById(bookSeatReq.getSeatIds());
         if (showSeatList.size() != bookSeatReq.getSeatIds().size()) {
@@ -193,12 +193,12 @@ public class ShowServiceImpl implements ShowService {
             throw new SeatBookingInternalError("error reserving seat booking information", ErrorCode.SEAT_BOOKING_ERROR.getCode());
         }
 
-        try{
+        try {
             BookingTTL bookingTTL = new BookingTTL(bookingEntity.getBookingId(), bookingEntity.getBookingTime());
             ValueOperations<String, Object> opsForValue = redisTemplate.opsForValue();
             String key = String.format(Constants.TTL_BOOKING_KEY_FORMAT, Constants.TTL_BOOKING_PREFIX, bookingTTL.getBookingId());
             opsForValue.set(key, bookingTTL, Duration.ofMinutes(bookingTtl));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info("error saving booking info in redis");
             throw new SeatBookingInternalError("error saving booking info in redis", ErrorCode.SEAT_BOOKING_ERROR.getCode());
         }
@@ -221,5 +221,38 @@ public class ShowServiceImpl implements ShowService {
                 .build();
 
         return bookingDto;
+    }
+
+    @Override
+    public List<TicketRes> allTickets() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        User user = userRepo.findByUserName(userName).get();
+
+        List<TicketEntity> ticketEntityList = ticketRepo.findByUser(user);
+        List<TicketRes> ticketResList = new ArrayList<>();
+
+        for (TicketEntity ticketEntity : ticketEntityList) {
+            MovieEntity movieEntity = ticketEntity.getMovieEntity();
+            ShowEntity showEntity = ticketEntity.getShowEntity();
+            List<ShowSeat> showSeatList = showEntity.getSeatList();
+            TicketRes ticketRes = TicketRes.builder()
+                    .bookingTime(ticketEntity.getBookingTime())
+                    .movieName(movieEntity.getName())
+                    .screenName(showEntity.getScreenEntity().getScreenName())
+                    .theatreName(showEntity.getTheatreEntity().getName())
+                    .theatreCity(showEntity.getTheatreEntity().getCity())
+                    .addressLine(showEntity.getTheatreEntity().getAddressLine1())
+                    .bookedSeats(showSeatList.stream().map(showSeat -> SeatRes.builder()
+                            .seatId(showSeat.getShowSeatId())
+                            .col(showSeat.getSeat().getCol())
+                            .row(showSeat.getSeat().getRow())
+                            .seatName(showSeat.getSeat().getSeatName())
+                            .seatType(showSeat.getSeat().getSeatType().name())
+                            .build()).collect(Collectors.toList()))
+                    .build();
+            ticketResList.add(ticketRes);
+        }
+        return ticketResList;
     }
 }

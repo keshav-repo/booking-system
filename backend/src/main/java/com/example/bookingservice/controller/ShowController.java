@@ -2,6 +2,7 @@ package com.example.bookingservice.controller;
 
 import com.example.bookingservice.dto.*;
 import com.example.bookingservice.service.ShowService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,5 +25,10 @@ public class ShowController {
     @PostMapping("/book")
     public BookingDto bookSeat(@RequestBody BookSeatReq bookSeatReq){
         return showService.bookSeat(bookSeatReq);
+    }
+
+    @GetMapping("/appTickets")
+    public List<TicketRes> allTickets(){
+        return showService.allTickets();
     }
 }
