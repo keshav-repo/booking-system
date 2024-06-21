@@ -235,7 +235,7 @@ public class ShowServiceImpl implements ShowService {
         for (TicketEntity ticketEntity : ticketEntityList) {
             MovieEntity movieEntity = ticketEntity.getMovieEntity();
             ShowEntity showEntity = ticketEntity.getShowEntity();
-            List<ShowSeat> showSeatList = showEntity.getSeatList();
+            List<ShowSeat> showSeatList = ticketEntity.getShowSeatList();
             TicketRes ticketRes = TicketRes.builder()
                     .bookingTime(ticketEntity.getBookingTime())
                     .movieName(movieEntity.getName())
